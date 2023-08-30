@@ -8,3 +8,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Router />
   </React.StrictMode>,
 )
+// Componentizar o botão inicial
+// Componentizar data
+// Componentizar select
