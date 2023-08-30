@@ -11,3 +11,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // Componentizar o botão inicial
 // Componentizar data
 // Componentizar select
+// Mudar o nome do pacientesTableHeads
+// Criar componente para titulo

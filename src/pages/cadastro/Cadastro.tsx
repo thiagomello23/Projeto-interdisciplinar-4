@@ -1,6 +1,7 @@
 import {} from 'react'
 import FormElement from '../../components/FormElement'
 import Button from '../../components/Button'
+import Select from '../../components/Select'
 
 export default function Cadastro() {
   return (
@@ -14,9 +15,7 @@ export default function Cadastro() {
         <FormElement label='Telefone' placeholder='Digite o telefone do paciente' />
         <FormElement label='Idade' placeholder='Digite a idade do paciente' />
         <div className='flex items-center justify-between text-white'>
-          <select defaultValue={0} name="" id="" className='bg-secondary-color p-3 w-[350px] outline-none'>
-            <option value="0" className='first:hidden'>Escolha um procedimento</option>
-          </select>
+          <div className='w-[350px]'><Select label='Procedimento' options={[]} /></div>
           <div className='bg-secondary-color p-3 cursor-pointer'>
             Escolha uma data
           </div>

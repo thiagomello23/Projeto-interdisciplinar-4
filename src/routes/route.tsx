@@ -7,6 +7,7 @@ import Dashboard from "../pages/dashboard/Dashboard"
 import Cadastro from "../pages/cadastro/Cadastro"
 import Procedimento from "../pages/procedimento/Procedimento"
 import Relatorio from "../pages/relatorio/Relatorio"
+import Admin from "../pages/admin/Admin"
 
 export const router = createBrowserRouter([
   {
@@ -33,5 +34,9 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />
+  },
+  {
+    path: '/admin',
+    element: <Admin />
   }
 ])

@@ -5,7 +5,9 @@ export default function Navbar() {
   return (
     <nav className='text-white min-h-screen w-[300px] bg-primary-color relative'>
       <h1 className='bg-secondary-color text-2xl mb-28 p-4 text-center'>
-        Bem vindo "Nome"
+        Bem vindo
+        <br />
+        "Nome"
       </h1>
       <ul className='text-center flex flex-col'>
         <NavLink 
