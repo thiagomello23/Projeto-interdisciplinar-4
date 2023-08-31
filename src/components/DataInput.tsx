@@ -1,8 +1,9 @@
 import {} from 'react'
+import {UseFormRegister, FieldValues } from 'react-hook-form'
 
 export default function DataInput(
-  {label, state, setState}: 
-  {label: string, state: string, setState: (str: string) => void}
+  {label, register}: 
+  {label: string, register: UseFormRegister<FieldValues>}
 ) {
   return (
     <div className='h-[60px] flex'>
@@ -11,10 +12,7 @@ export default function DataInput(
         type="text" 
         className='w-full h-full shadow-lg p-4 outline-none' 
         placeholder='27/07/2023'
-        value={state}
-        onChange={(e) => {
-          setState(e.target.value)
-        }}
+        {...register(label)}
       />
     </div>
   )

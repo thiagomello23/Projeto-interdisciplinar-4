@@ -1,11 +1,15 @@
-import {} from 'react'
+import React, {} from 'react'
+import {UseFormRegister, FieldValues } from 'react-hook-form'
 
 export default function Select(
-  {label, options, state, setState}: 
-  {label: string, options: string[], state: string, setState: (st: string) => void}
+  {label, options}: 
+  {label: string, options: string[], register: UseFormRegister<FieldValues>}
 ) {
   return (
-    <select defaultValue={0} value={state} onChange={(e) => {setState(e.target.value)}} className='bg-secondary-color p-3 w-full outline-none text-white'>
+    <select 
+      defaultValue={0} 
+      className='bg-secondary-color p-3 w-full outline-none text-white'
+    >
       <option value={0} className='first:hidden'>{label}</option>
       {options.map(el => (
         <option value={el} key={el} className='bg-white text-black'>{el}</option>
