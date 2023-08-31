@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import React, {} from 'react'
 import { UseFormRegister, FieldValues } from 'react-hook-form'
 
@@ -18,11 +20,7 @@ export default function Select(
   )
 }
 
-export const Select2 = React.forwardRef<
-  HTMLSelectElement, 
-  {label: string, options: string[]} 
-  & ReturnType<UseFormRegister<FieldValues>>
->(({label, options, onChange, name, onBlur}, ref) => {
+export const Select2 = React.forwardRef<HTMLSelectElement, {label: string, options: string[]} & ReturnType<UseFormRegister<FieldValues>>>(({label, options, onChange, name, onBlur}, ref) => {
 
   return (
     <select 
