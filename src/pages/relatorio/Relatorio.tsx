@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import {} from 'react'
 import DataInput from '../../components/DataInput'
-import Select from '../../components/Select'
+import {Select2} from '../../components/Select'
 import Check from '../../components/Check'
 import { pacienteTableHeads } from '../../globals'
 import FormElement from '../../components/FormElement'
@@ -12,7 +12,8 @@ export default function Relatorio() {
   // Relatório State
   const { handleSubmit, register } = useForm()
 
-  const onSubmit = data => console.log(data)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onSubmit = (data: any) => console.log(data)
 
   return (
     <div className='w-[80%] m-auto'>
@@ -39,15 +40,17 @@ export default function Relatorio() {
           </div>
           <div className='flex justify-between items-center w-full'>
             <div className='w-[47%]'>
-              <Select
+              <Select2
                 label='Escolha um procedimento'
                 options={[]}
+                {...register("procedimentoSel")}
               />
             </div>
             <div className='w-[16%]'>
-              <Select
+              <Select2
                 label='Ascendente'
                 options={['Ascendente', 'Descendente']}
+                {...register("filtro")}
               />
             </div>
           </div>
@@ -64,9 +67,10 @@ export default function Relatorio() {
           <div className='mt-10 flex justify-between items-center'>
             <div className='w-[50%]'>
               <h1 className='text-2xl text-primary-color mb-3'>Procedimento específico</h1>
-              <Select
+              <Select2
                 label='Filtrar por procedimento específico'
                 options={[]}
+                {...register("procEspecifico")}
               />
             </div>
             <div className=''>
@@ -76,12 +80,16 @@ export default function Relatorio() {
                   <FormElement
                     label=''
                     placeholder='MIN'
+                    metadata='min'
+                    register={register}
                   />
                 </div>
                 <div className='w-[120px]'>
                   <FormElement
                     label=''
                     placeholder='MAX'
+                    metadata='max'
+                    register={register}
                   />
                 </div>
               </div>

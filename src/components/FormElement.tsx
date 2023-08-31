@@ -1,8 +1,9 @@
 import {} from 'react'
+import { UseFormRegister, FieldValues } from 'react-hook-form'
 
 export default function FormElement(
-  {label, placeholder, value, state, setState}: 
-  {label: string, placeholder: string, value?: string, state: string, setState: (str: string) => void}
+  {label, placeholder, register, metadata}: 
+  {label: string, placeholder: string, register: UseFormRegister<FieldValues>, metadata: string}
 ) {
   return (
     <div className='flex flex-col w-full'>
@@ -12,9 +13,7 @@ export default function FormElement(
         placeholder={placeholder} 
         id={label} 
         className='shadow-md p-3 outline-none' 
-        defaultValue={value} 
-        value={state}
-        onChange={(e) => setState(e.target.value)}
+        {...register(metadata)}
       />
     </div>
   )
