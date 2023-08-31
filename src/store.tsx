@@ -16,5 +16,5 @@ export const useStore = create<Store>()((set => ({
   modal: false,
   modalData: {processo: "", valor: ""},
   setModal: (bool: boolean) => set(() => ({modal: bool})),
-  setModalData: (mData: modalData) => set(() => ({modalData: mData}))
+  setModalData: (mData: modalData) => set(() => ({modalData: mData})),
 })))
