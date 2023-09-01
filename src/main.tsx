@@ -8,8 +8,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Router />
   </React.StrictMode>,
 )
-// Componentizar o botão inicial
-// Componentizar data
-// Componentizar select
 // Mudar o nome do pacientesTableHeads
 // Criar componente para titulo
+// Fazer a tipagem de dados das telas, Colocar loaders nos botoes, 
+// fazer error handlers, adicionar toasts, adicionar skeleton loaders
+// Colocar tipagem dinamica nos inputs
+// Bug no procedimento, botao com cor diferente e problema no submit

@@ -1,13 +1,16 @@
-import { useState } from 'react'
+import {} from 'react'
 import Fundo from "../../assets/login_banner.jpeg"
 import FormElement from '../../components/FormElement'
 import Button from '../../components/Button'
+import { useForm } from "react-hook-form"
 
 export default function Login() {
 
-  // Form State
-  const [email, setEmail] = useState<string>("")
-  const [senha, setSenha] = useState<string>("")
+  const { register, handleSubmit } = useForm()
+
+  const onLoginSubmit = (data: any) => {
+    console.log(data)
+  }
 
   return (
     <main className='bg-white w-full min-h-screen flex relative'>
@@ -19,18 +22,19 @@ export default function Login() {
           <div className='border-b-2 border-b-primary-color w-[80%] m-auto text-center mb-10'>
             <h1 className='text-6xl pb-4 text-primary-color'>Log In</h1>
           </div>
-          <form action="" className='flex flex-col gap-5'>
+          <form action="" className='flex flex-col gap-5' onSubmit={handleSubmit(onLoginSubmit)}>
             <FormElement 
               label='Email' 
               placeholder='Digite seu email' 
-              state={email}
-              setState={setEmail}
+              metadata='email'
+              register={register}
             />
             <FormElement 
               label='Senha' 
               placeholder='Digite sua senha'
-              state={senha}
-              setState={setSenha}
+              metadata='senha'
+              register={register}
+              type='password'
             />
             <div className='text-center'>
               <Button text='Entrar' />

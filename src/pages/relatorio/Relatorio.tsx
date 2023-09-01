@@ -1,6 +1,6 @@
 import {} from 'react'
 import DataInput from '../../components/DataInput'
-import {Select2} from '../../components/Select'
+import Select from '../../components/Select'
 import Check from '../../components/Check'
 import { pacienteTableHeads } from '../../globals'
 import FormElement from '../../components/FormElement'
@@ -40,14 +40,14 @@ export default function Relatorio() {
         </div>
         <div className='flex justify-between items-center w-full'>
           <div className='w-[47%]'>
-            <Select2
+            <Select
               label='Escolha um procedimento'
               options={[]}
               {...register("procedimentoSel")}
             />
           </div>
           <div className='w-[16%]'>
-            <Select2
+            <Select
               label='Ascendente'
               options={['Ascendente', 'Descendente']}
               {...register("filtro")}
@@ -67,7 +67,7 @@ export default function Relatorio() {
         <div className='mt-10 flex justify-between items-center'>
           <div className='w-[50%]'>
             <h1 className='text-2xl text-primary-color mb-3'>Procedimento específico</h1>
-            <Select2
+            <Select
               label='Filtrar por procedimento específico'
               options={[]}
               {...register("procEspecifico")}

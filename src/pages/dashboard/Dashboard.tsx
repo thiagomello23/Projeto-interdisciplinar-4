@@ -1,21 +1,28 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { pacienteTableHeads } from '../../globals'
 import TableElement from '../../components/TableElement'
 import Select from '../../components/Select'
 import Search from '../../components/Search'
 import { BiEdit } from "react-icons/bi"
 import { IconContext } from 'react-icons/'
+import { useForm } from "react-hook-form"
 
 export default function Dashboard() {
-  // Filter States
-  const [date, setDate] = useState("21/03/2023")
-  const [search, setSearch] = useState("")
-  const [filter, setFilter] = useState("")
-  const [ordering, setOrdering] = useState("")
+  // Forms
+  const { register, getValues, watch, handleSubmit } = useForm()
 
   useEffect(() => {
-    // Toda vez que o search mudar eu atualizo os dados
-  }, [search])
+    // Toda vez que o filtro ou a ordenação mudar
+    console.log(getValues())
+  }, [watch(['filtro', 'ordenacao']), getValues])
+
+  const onDataSubmit = (data: any) => {
+    console.log(data)
+  }
+
+  const onSearchSubmit = (data: any) => {
+    console.log(data)
+  }
 
   return (
     <div className='w-[90%] m-auto'>
@@ -33,33 +40,40 @@ export default function Dashboard() {
             <input 
               type="text" 
               placeholder='23/08/2023' 
-              value={date} 
-              onChange={(e) => setDate(e.target.value)} className='outline-none'
+              {...register("data")}
             />
             <div className='p-3 ml-2 bg-secondary-color text-white cursor-pointer'>
-              <BiEdit />
+              {/* Form especifico para Submit de Data */}
+              <form onSubmit={handleSubmit(onDataSubmit)}>
+                <button type='submit'>
+                  <BiEdit />
+                </button>
+              </form>
             </div>
           </div>
           </IconContext.Provider>
 
           {/* Filters */}
           <div className='w-[350px]'>
-            <Search state={search} setState={setSearch} />
+            {/* Form especifico para submit de Busca */}
+            <form action="" onSubmit={handleSubmit(onSearchSubmit)}>
+              <button type='submit' className='w-[330px]'>
+                <Search register={register} metadata='search' />
+              </button>
+            </form>
           </div>
           <div className='w-[300px]'>
             <Select 
               label='Selecione um filtro' 
               options={pacienteTableHeads}
-              state={filter}
-              setState={setFilter}
+              {...register("filtro")}
             />
           </div>
           <div className='w-[100px]'>
             <Select 
               label='ASC' 
               options={['ASC', 'DESC']}
-              state={ordering}
-              setState={setOrdering}
+              {...register("ordenacao")}
             />
           </div>
         </div>
