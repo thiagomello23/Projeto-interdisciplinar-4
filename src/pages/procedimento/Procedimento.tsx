@@ -77,8 +77,10 @@ export default function Procedimento() {
               register={registerEdit}
             />
             <div className=' flex flex-1 justify-between'>
-              <Button text='Cadastrar' />
-              <Button text='Excluir' exclude />
+              <div className='w-[200px]'>
+                <Button text='Cadastrar' /></div>
+              <div className='w-[200px]'>
+                <Button text='Excluir' exclude={true} /></div>
             </div>
           </form>
         </div>

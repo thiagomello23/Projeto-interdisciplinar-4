@@ -14,3 +14,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // fazer error handlers, adicionar toasts, adicionar skeleton loaders
 // Colocar tipagem dinamica nos inputs
 // Bug no procedimento, botao com cor diferente e problema no submit
+
+// Fazer a tipagem de maneira correta

@@ -1,14 +1,33 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { pacienteTableHeads } from '../../globals'
-import TableElement from '../../components/TableElement'
 import Select from '../../components/Select'
 import Search from '../../components/Search'
 import { BiEdit } from "react-icons/bi"
 import { IconContext } from 'react-icons/'
 import { useForm } from "react-hook-form"
+import useSWR from 'swr'
+import fetcher from '../../lib/axios'
+import { useNavigate } from 'react-router-dom'
+import dayjs from 'dayjs'
+import TableRender from '../../components/TableRender'
 
+/* 
+  Problemas: 
+    -- Mostrar o valor de cada consulta
+    -- Tamanho da tela não esta suportando 1024px sem quebrar
+    -- Colocar uma mascara no input de data
+    -- Filtro e ordenação não funcionam
+    -- Puxar por data especifica não funciona
+*/
 export default function Dashboard() {
-  // Forms
+
+  // STATES
+  const [searchData, setSearchData] = useState<DashboardData[]| null>(null)
+
+  // NAVIGATE
+  const navigate = useNavigate()
+
+  // FORMS
   const { register, getValues, watch, handleSubmit } = useForm()
 
   useEffect(() => {
@@ -16,12 +35,31 @@ export default function Dashboard() {
     console.log(getValues())
   }, [watch(['filtro', 'ordenacao']), getValues])
 
+  // INITIAL FETCHER
+  const { data: tableData, error: tableError } = useSWR('/paciente', fetcher)
+
+  if(tableError) {
+    navigate('/login')
+  }
+
+  if(!tableData) {
+    return null
+  }
+  // INITIAL FETCHER
+
+  // HANDLERS
   const onDataSubmit = (data: any) => {
     console.log(data)
   }
 
   const onSearchSubmit = (data: any) => {
-    console.log(data)
+    setSearchData(
+      tableData.filter((item: DashboardData) => {
+        if(item.nome.startsWith(data.search)) {
+          return item;
+        }
+      })
+    )
   }
 
   return (
@@ -39,7 +77,8 @@ export default function Dashboard() {
           >
             <input 
               type="text" 
-              placeholder='23/08/2023' 
+              className='outline-none'
+              placeholder={dayjs().format("D/M/YYYY")}
               {...register("data")}
             />
             <div className='p-3 ml-2 bg-secondary-color text-white cursor-pointer'>
@@ -87,8 +126,12 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            <TableElement data={["teste","teste","teste","teste","teste","teste","teste"]} />
-            <TableElement data={["teste","teste","teste","teste","teste","teste","teste"]} />
+            {/* Table Render */}
+            {searchData ? (
+              <TableRender renderItem={searchData} />
+            ) : (
+              <TableRender renderItem={tableData} />
+            )}
           </tbody>
         </table>
       </div>

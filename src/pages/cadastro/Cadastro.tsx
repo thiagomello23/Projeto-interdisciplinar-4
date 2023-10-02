@@ -1,14 +1,56 @@
-import {} from 'react'
+import { useState } from 'react'
 import FormElement from '../../components/FormElement'
 import Button from '../../components/Button'
 import Select from '../../components/Select'
 import { useForm } from "react-hook-form"
+import dayjs from "dayjs"
+import { api } from '../../lib/axios'
+import { localStorageKey } from '../../globals'
 
+/* 
+  Problemas:
+    -- Componentizar o elemento "Error"
+    -- Validar os procedimentos (data.procedimento !== "0"  ||)
+*/
 export default function Cadastro() {
   const { register, handleSubmit } = useForm<CadastroForm>()
 
-  const onSubmit = (data: CadastroForm) => {
+  const [error, setError] = useState<string>("")
+
+  const onSubmit = async (data: CadastroForm) => {
     console.log(data)
+
+    // Validação minima de dados
+    if(
+      !data.data ||
+      !data.horario ||
+      !data.idade ||
+      !data.nome ||
+      !data.sobrenome || 
+      !data.telefone
+    ) {
+      //
+      setError("Por favor preencha todos os campos!")
+      return;
+    }
+
+    // Tratamento de Data
+    const horarioFormatado = dayjs(data.data).toISOString()
+
+    // Envio para a API
+    const { status } = await api.post('', {...data, horario: horarioFormatado}, {
+      headers: {
+        Authorization: localStorage.getItem(localStorageKey)
+      }
+    })
+
+    // Resposta
+    if(status >= 400) {
+      //
+      setError("Campos invalidos!")
+    } else {
+      //
+    }
   }
 
   return (
@@ -66,6 +108,9 @@ export default function Cadastro() {
             />
           </div>
         </div>
+        {error && (
+          <p className='text-sm text-red-500 text-center font-bold'>{error}</p>
+        )}
         <div className='w-[35%] m-auto'>
           <Button text='Cadastrar' />
         </div>

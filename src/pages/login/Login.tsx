@@ -1,15 +1,51 @@
-import {} from 'react'
+import { useState } from 'react'
 import Fundo from "../../assets/login_banner.jpeg"
 import FormElement from '../../components/FormElement'
 import Button from '../../components/Button'
 import { useForm } from "react-hook-form"
+import { api } from '../../lib/axios'
+import { localStorageKey } from '../../globals'
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
 
   const { register, handleSubmit } = useForm()
 
-  const onLoginSubmit = (data: any) => {
-    console.log(data)
+  const navigate = useNavigate()
+
+  const [error, setError] = useState<string>("")
+
+  const [loader, setLoader] = useState<boolean>(false)
+
+  const onLoginSubmit = async (data: any) => {
+
+    // Define um loading
+    setLoader(true)
+
+    // Validação minima de dados
+    if(
+      !(data.email.trim().length > 0) || 
+      !(data.senha.trim().length > 0)
+    ) {
+      setLoader(false)
+      setError("Por favor, preencha todos os campos!")
+      return;
+    }
+
+    // Envio dos dados para a requisição
+    const { data: d, status } = await api.post("/auth", data)
+
+    // Resposta
+    if(status > 400) {
+      setError("Email ou senha invalidos!")
+    } else {
+      // Salvar no localStorage
+      localStorage.setItem(localStorageKey, d.token)
+      // Redirecionar
+      navigate("/")
+    }
+
+    setLoader(false)
   }
 
   return (
@@ -36,8 +72,12 @@ export default function Login() {
               register={register}
               type='password'
             />
+            {/* Error handling */}
+            {error && (
+              <p className='text-sm text-red-500 text-center font-bold'>{error}</p>
+            )}
             <div className='text-center'>
-              <Button text='Entrar' />
+              <Button text='Entrar' loading={loader} />
             </div>
           </form>
         </div>

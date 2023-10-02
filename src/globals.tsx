@@ -8,3 +8,5 @@ export const pacienteTableHeads = [
   "Valor",
   "Telefone"
 ]
+
+export const localStorageKey = "token"
