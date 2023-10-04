@@ -21,3 +21,14 @@ type DashboardData = {
   // Não existe "valor" em paciente
   valor: string;
 }
+
+type ProcedimentoData = {
+  id: string;
+  nome: string;
+  valor: string;
+  usuarioId: string;
+}
+
+type ProcedimentoSubmit = {nomeProcesso: string, valor: string}
+
+type ProcedimentoEdit = {editNomeProcesso: string, editValueProcesso: string}

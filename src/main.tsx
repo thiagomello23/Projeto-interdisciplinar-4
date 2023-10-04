@@ -16,3 +16,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 // Bug no procedimento, botao com cor diferente e problema no submit
 
 // Fazer a tipagem de maneira correta
+// Achar uma maneira melhor de fazer busca usando JS
+// Adicionar mascara nos inputs
+// Aumentar tempo de vida do token
+// corrigir problema no update dos processos

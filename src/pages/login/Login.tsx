@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form"
 import { api } from '../../lib/axios'
 import { localStorageKey } from '../../globals'
 import { useNavigate } from 'react-router-dom';
+import ErrorMessage from '../../components/ErrorMessage'
 
 export default function Login() {
 
@@ -74,7 +75,7 @@ export default function Login() {
             />
             {/* Error handling */}
             {error && (
-              <p className='text-sm text-red-500 text-center font-bold'>{error}</p>
+              <ErrorMessage error={error} />
             )}
             <div className='text-center'>
               <Button text='Entrar' loading={loader} />

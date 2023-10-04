@@ -1,34 +1,188 @@
-import {  } from 'react'
+import {  useState } from 'react'
 import FormElement from '../../components/FormElement'
 import Button from '../../components/Button'
-import ProcessoElement from '../../components/ProcessoElement'
 import Search from '../../components/Search'
 import { useStore } from "../../store"
 import { useForm } from "react-hook-form"
+import useSWR from 'swr'
+import fetcher, { api } from '../../lib/axios'
+import ProcessoRender from '../../components/ProcessoRender'
+import { useNavigate } from 'react-router-dom'
+import { localStorageKey } from '../../globals'
+import ErrorMessage from '../../components/ErrorMessage'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
+/* 
+  Bug na exclusão do procedimento, quando abre a modal os dados antigos são mostrados
+  (Problema esta no react hook forms)
+*/
 export default function Procedimento() {
+
+  // State
   const modal = useStore(store => store.modal)
   const setModal = useStore(store => store.setModal)
   const modalData = useStore(store => store.modalData)
 
-  const { register, handleSubmit } = useForm()
-  const { register: registerEdit, handleSubmit: handleEdit } = useForm()
+  const [searchData, setSearchData] = useState<ProcedimentoData[]>()
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [modalErrorMessage, setModalErrorMessage] = useState<string>('')
+  const [loader, setLoader] = useState<boolean>(false)
+  const [modalLoaders, setModalLoaders] = useState({
+    edit: false,
+    exclude: false
+  })
+
+  const navigate = useNavigate()
+ 
+  const { register, handleSubmit } = useForm<ProcedimentoSubmit>()
+  const { register: registerEdit, handleSubmit: handleEdit } = useForm<ProcedimentoEdit>()
   const { register: registerSearch, handleSubmit: handleSearch } = useForm()
 
-  const onCadastroSubmit = (data: any) => {
-    console.log(data)
+  // INITIAL DATA
+  const { data, error, mutate } = useSWR('/procedimento', fetcher)
+
+  if(error) {
+    navigate('/login')
   }
 
-  const onSearchSubmit = (data: any) => {
-    console.log(data)
+  if(!data) {
+    return null;
+  }
+  // INITIAL DATA
+
+  const onCadastroSubmit = async (d: ProcedimentoSubmit) => {
+    setLoader(true)
+
+    // Validação minima de dados
+    if(
+      d.nomeProcesso.trim().length === 0 ||
+      d.valor.trim().length === 0 
+    ) {
+      setErrorMessage("Por favor preencha todos os campos!")
+      setLoader(false)
+      return;
+    }
+
+    if(!(+d.valor > 0)) {
+      setErrorMessage("O campo valor não pode ser negativo!")
+      setLoader(false)
+      return;
+    }
+
+    // Enviar os dados para API
+    const { status } = await api.post('/procedimento', {
+      nome: d.nomeProcesso,
+      valor: d.valor
+    }, {
+      headers: {
+        Authorization: localStorage.getItem(localStorageKey)
+      }
+    })
+
+    // Validar o envio
+    if(status >= 400) {
+      // error handler de procedimento já cadastrado
+      setErrorMessage("Procedimento já cadastrado!")
+    } else {
+      // Toasty dizendo que cadastrou com sucesso
+      toast.success('Procedimento cadastrado com sucesso!')
+      // Atualização na rota de API
+      mutate()
+      // Clear de dados
+      setErrorMessage('')
+    }
+
+    setLoader(false)
   }
 
-  const onEditProcesso = (data: any) => {
-    console.log(data)
+  const onSearchSubmit = (d: any) => {
+    setSearchData(
+      data.filter((item: ProcedimentoData) => {
+        if(item.nome.startsWith(d.search)) {
+          return item;
+        }
+      })
+    )
+  }
+
+  const onEditProcesso = async (d: ProcedimentoEdit) => {
+    // Botar um error handling especifico para modal
+    // Botar um loader especifico para modal tanto edit quant oexclusão
+    setModalLoaders({edit: true, exclude: false})
+
+    console.log(d)
+
+    // Pegando o ID do processo
+    const processoId = modalData.id
+
+    // Validação minima de dados
+    if(
+      d.editNomeProcesso.trim().length === 0 ||
+      d.editValueProcesso.trim().length === 0 
+    ) {
+      setModalErrorMessage("Por favor preencha todos os campos!")
+      setModalLoaders({edit: false, exclude: false})
+      return;
+    }
+
+    if(!(+d.editValueProcesso > 0)) {
+      setModalErrorMessage("O campo valor não pode ser negativo!")
+      setModalLoaders({edit: false, exclude: false})
+      return;
+    }
+
+    // Enviando a requisição de atualização dos dados
+    const { status } = await api.put('/procedimento', {
+      id: processoId,
+      nome: d.editNomeProcesso,
+      valor: d.editValueProcesso
+    }, {
+      headers: {
+        Authorization: localStorage.getItem(localStorageKey)
+      }
+    })
+
+    // Validando a resposta da requisição
+    if(status >= 400) {
+      // Mensagem de erro na modal
+    } else {  
+      // Toasty de sucesso
+      toast.success("Procedimento atualizado com sucesso!")
+      // Fecha a modal
+      setModal(false)
+      // Atualiza os dados
+      mutate()
+    }
+    setModalLoaders({edit: false, exclude: false})
+  }
+
+  const onExcludeProcess = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Pega o ID
+    const processId = modalData.id
+
+    // Enviar para a requisição da API
+    const { status } = await api.delete(`/procedimento/${processId}`, {
+      headers: {
+        Authorization: localStorage.getItem(localStorageKey)
+      }
+    })
+    
+    // Valida a resposta da requisição
+    if(status >= 400) {
+      setModalErrorMessage("Falha ao excluir o procedimento, tente novamente!")
+    } else {
+      mutate()
+      setModalErrorMessage("")
+      toast.success("Procedimento deletado com sucesso!")
+    }
   }
 
   return (
     <div className='w-[80%] m-auto'>
+      <ToastContainer />
       {/* Cadastrar procedimento */}
       <h1 className='text-primary-color text-3xl mb-10 mt-5 font-bold uppercase'>
         Cadastrar novo procedimento
@@ -42,8 +196,13 @@ export default function Procedimento() {
             <FormElement label='Valor' placeholder='ex: 2330,00' metadata='valor' register={register} />
           </div>
         </div>
+        {errorMessage && (
+          <div className='mt-10'>
+            <ErrorMessage error={errorMessage} />
+          </div>
+        )}
         <div className='text-center w-[50%] m-auto'>
-          <Button text='Cadastrar' />
+          <Button text='Cadastrar' loading={loader} />
         </div>
       </form>
       {/* Mostrar procedimentos cadastrados */}
@@ -54,14 +213,13 @@ export default function Procedimento() {
           </button>
         </form>
       </div>
+      {/* Renderização dos processos */}
       <div className='w-full bg-primary-color p-2 mt-5 flex flex-col gap-2'>
-        <ProcessoElement name='Um novo processo' value={20} />
-        <ProcessoElement name='Um novo processo' value={25} />
-        <ProcessoElement name='Um novo processo' value={30} />
+        {searchData ? <ProcessoRender renderItem={searchData} /> : <ProcessoRender renderItem={data} />}
       </div>
       {modal && (
         <div className='absolute top-1/2 left-1/2 translate-x-[-45%] translate-y-[-50%] z-30 bg-white w-[600px] p-10'>
-          <form action="" className='flex flex-col gap-6' onSubmit={handleEdit(onEditProcesso)}>
+          <form action="" className='flex flex-col gap-6'>
             <FormElement 
               label='Nome' 
               placeholder='Digite o nome do processo' 
@@ -76,11 +234,14 @@ export default function Procedimento() {
               metadata='editValueProcesso'
               register={registerEdit}
             />
+            {modalErrorMessage && (
+              <ErrorMessage error={modalErrorMessage} />
+            )}
             <div className=' flex flex-1 justify-between'>
               <div className='w-[200px]'>
-                <Button text='Cadastrar' /></div>
+                <Button text='Editar' loading={modalLoaders.edit} onClick={handleEdit(onEditProcesso)} /></div>
               <div className='w-[200px]'>
-                <Button text='Excluir' exclude={true} /></div>
+                <Button text='Excluir' loading={modalLoaders.exclude} exclude={true} onClick={onExcludeProcess} /></div>
             </div>
           </form>
         </div>
@@ -90,6 +251,7 @@ export default function Procedimento() {
         style={{display: modal ? "block" : "none"}}
         onClick={() => setModal(false)}
       ></div>
+      {modalData.processo}
     </div>
   )
 }
