@@ -1,16 +1,17 @@
 import {  useState } from 'react'
-import { pacienteTableHeads } from '../../globals'
+import { localStorageKey, pacienteTableHeads } from '../../globals'
 // import Select from '../../components/Select'
 import Search from '../../components/Search'
 import { BiEdit } from "react-icons/bi"
 import { IconContext } from 'react-icons/'
 import { useForm } from "react-hook-form"
 import useSWR from 'swr'
-import fetcher from '../../lib/axios'
+import fetcher, { api } from '../../lib/axios'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import TableRender from '../../components/TableRender'
 import InputMask from 'react-input-mask';
+import ErrorMessage from '../../components/ErrorMessage'
 
 /* 
   Problemas: 
@@ -23,18 +24,14 @@ export default function Dashboard() {
 
   // STATES
   const [searchData, setSearchData] = useState<DashboardData[]| null>(null)
+  const [searchDate, setSearchDate] = useState<DashboardData[]| null>(null)
+  const [errorMessage, setErrorMessage] = useState<string>("")
 
   // NAVIGATE
   const navigate = useNavigate()
 
-  // FORMS
-  const { register, getValues, watch, handleSubmit } = useForm()
-
-  // Seleção de filtor e ASC|DESC
-  // useEffect(() => {
-  //   // Toda vez que o filtro ou a ordenação mudar
-  //   console.log(getValues())
-  // }, [watch(['filtro', 'ordenacao']), getValues])
+  // FORMS (getValues, watch,)
+  const { register, handleSubmit, reset } = useForm()
 
   // INITIAL FETCHER
   const { data: tableData, error: tableError, isLoading } = useSWR('/paciente', fetcher)
@@ -45,22 +42,55 @@ export default function Dashboard() {
   // INITIAL FETCHER
 
   // HANDLERS
-  const onDataSubmit = (data: any) => {
-    const date = data.data;
+  const onDataSubmit = async (data: any) => {
+    reset()
+    setSearchData([])
+
+    // Tratamento de data // 21/10/1974
+    const newDate = data.data.split("/") // Pega em sequencia, Dia, Mes e Ano
+    const engFormat = `${newDate[1]}-${newDate[0]}-${newDate[2]}`;
+    let dataFormatada;
+
+    try {
+      dataFormatada = dayjs(engFormat).toISOString()
+    } catch(e) {
+      setErrorMessage("Data invalida!")
+      return;
+    }
 
     // Puxa os registros com base na data atual
+    const {status, data: d} = await api.get(`/paciente/${dataFormatada}`, {
+      headers: {
+        Authorization: localStorage.getItem(localStorageKey)
+      }
+    }) 
 
     // Verifica a resposta da requisição
+    if(status >= 400) {
+      setErrorMessage("Falha ao recuperar os dados por esta data!")
+    } else {
+      setSearchDate(d)
+    }
   }
 
   const onSearchSubmit = (data: any) => {
-    setSearchData(
-      tableData.filter((item: DashboardData) => {
-        if(item.nome.startsWith(data.search)) {
-          return item;
-        }
-      })
-    )
+    if(!(searchDate?.length === 0) && (searchDate)) {
+      setSearchData(
+        searchDate!.filter((item: DashboardData) => {
+          if(item.nome.startsWith(data.search)) {
+            return item;
+          }
+        })
+      )
+    } else {
+      setSearchData(
+        tableData!.filter((item: DashboardData) => {
+          if(item.nome.startsWith(data.search)) {
+            return item;
+          }
+        })
+      )
+    }
   }
 
   return (
@@ -94,7 +124,6 @@ export default function Dashboard() {
             </div>
           </div>
           </IconContext.Provider>
-
           {/* Filters */}
           <div className='w-[350px]'>
             {/* Form especifico para submit de Busca */}
@@ -104,22 +133,11 @@ export default function Dashboard() {
               </button>
             </form>
           </div>
-          {/* <div className='w-[300px]'>
-            <Select 
-              label='Selecione um filtro' 
-              options={pacienteTableHeads}
-              {...register("filtro")}
-            />
-          </div>
-          <div className='w-[100px]'>
-            <Select 
-              label='ASC' 
-              options={['ASC', 'DESC']}
-              {...register("ordenacao")}
-            />
-          </div> */}
         </div>
         {/* Table */}
+        {errorMessage && (
+          <ErrorMessage error={errorMessage} />
+        )}
         <table className='w-full shadow-lg'>
           <thead className='bg-secondary-color text-white p-3 w-full'>
             <tr>
@@ -130,7 +148,9 @@ export default function Dashboard() {
           </thead>
           <tbody>
             {/* Table Render */}
-            {searchData ? (
+            {searchDate ? (
+              <TableRender renderItem={searchDate} />
+            ) : searchData ? (
               <TableRender renderItem={searchData} />
             ) : tableData ? (
               <TableRender renderItem={tableData} />
@@ -147,3 +167,23 @@ export default function Dashboard() {
     </div>
   )
 }
+// Seleção de filtor e ASC|DESC
+// useEffect(() => {
+//   // Toda vez que o filtro ou a ordenação mudar
+//   console.log(getValues())
+// }, [watch(['filtro', 'ordenacao']), getValues])
+
+{/* <div className='w-[300px]'>
+  <Select 
+    label='Selecione um filtro' 
+    options={pacienteTableHeads}
+    {...register("filtro")}
+  />
+</div>
+<div className='w-[100px]'>
+  <Select 
+    label='ASC' 
+    options={['ASC', 'DESC']}
+    {...register("ordenacao")}
+  />
+</div> */}

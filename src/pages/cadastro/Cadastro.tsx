@@ -41,8 +41,6 @@ export default function Cadastro() {
     setLoader(true)
     setError("")
 
-    console.log(data)
-
     // Validação minima de dados
     if(
       !data.data ||
