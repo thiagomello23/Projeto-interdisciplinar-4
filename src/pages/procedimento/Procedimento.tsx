@@ -23,6 +23,7 @@ export default function Procedimento() {
   const modal = useStore(store => store.modal)
   const setModal = useStore(store => store.setModal)
   const modalData = useStore(store => store.modalData)
+  const setModalData = useStore(store => store.setModalData)
 
   const [searchData, setSearchData] = useState<ProcedimentoData[]>()
   const [errorMessage, setErrorMessage] = useState<string>('')
@@ -36,7 +37,7 @@ export default function Procedimento() {
   const navigate = useNavigate()
  
   const { register, handleSubmit } = useForm<ProcedimentoSubmit>()
-  const { register: registerEdit, handleSubmit: handleEdit } = useForm<ProcedimentoEdit>()
+  // const { register: registerEdit, handleSubmit: handleEdit } = useForm<ProcedimentoEdit>() // Bug de estado
   const { register: registerSearch, handleSubmit: handleSearch } = useForm()
 
   // INITIAL DATA
@@ -106,27 +107,26 @@ export default function Procedimento() {
     )
   }
 
-  const onEditProcesso = async (d: ProcedimentoEdit) => {
+  const onEditProcesso = async (e: React.FormEvent) => {
+    e.preventDefault()
     // Botar um error handling especifico para modal
     // Botar um loader especifico para modal tanto edit quant oexclusão
     setModalLoaders({edit: true, exclude: false})
-
-    console.log(d)
 
     // Pegando o ID do processo
     const processoId = modalData.id
 
     // Validação minima de dados
     if(
-      d.editNomeProcesso.trim().length === 0 ||
-      d.editValueProcesso.trim().length === 0 
+      modalData.processo.trim().length === 0 ||
+      modalData.valor.toString().trim().length === 0 
     ) {
       setModalErrorMessage("Por favor preencha todos os campos!")
       setModalLoaders({edit: false, exclude: false})
       return;
     }
 
-    if(!(+d.editValueProcesso > 0)) {
+    if(!(+modalData.valor > 0)) {
       setModalErrorMessage("O campo valor não pode ser negativo!")
       setModalLoaders({edit: false, exclude: false})
       return;
@@ -135,8 +135,8 @@ export default function Procedimento() {
     // Enviando a requisição de atualização dos dados
     const { status } = await api.put('/procedimento', {
       id: processoId,
-      nome: d.editNomeProcesso,
-      valor: d.editValueProcesso
+      nome: modalData.processo,
+      valor: modalData.valor
     }, {
       headers: {
         Authorization: localStorage.getItem(localStorageKey)
@@ -220,26 +220,35 @@ export default function Procedimento() {
       {modal && (
         <div className='absolute top-1/2 left-1/2 translate-x-[-45%] translate-y-[-50%] z-30 bg-white w-[600px] p-10'>
           <form action="" className='flex flex-col gap-6'>
-            <FormElement 
-              label='Nome' 
-              placeholder='Digite o nome do processo' 
-              defaultValue={modalData.processo} 
-              metadata='editNomeProcesso'
-              register={registerEdit}
-            />
-            <FormElement 
-              label='Valor' 
-              placeholder='Digite o valor do processo' 
-              defaultValue={modalData.valor.toString()} 
-              metadata='editValueProcesso'
-              register={registerEdit}
-            />
+            {/* Re renderizando os componentes na mão por bug de state do react */}
+            <div className='flex flex-col w-full'>
+              <label htmlFor={"Nome"} className='text-xl text-primary-color mb-3 font-bold'>Nome</label>
+              <input 
+                // key={modalData.processo}
+                placeholder={"Digite o nome do processo!"} 
+                id={"Nome"}
+                className='shadow-md p-3 outline-none' 
+                value={modalData.processo}
+                onChange={(e) => setModalData({valor: modalData.valor, processo: e.target.value, id: modalData.id})}
+              />
+            </div>
+            <div className='flex flex-col w-full'>
+              <label htmlFor={"Valor"} className='text-xl text-primary-color mb-3 font-bold'>Valor</label>
+              <input 
+                // key={modalData.valor.toString()}
+                placeholder={"Digite o valor do processo!"} 
+                id={"Valor"} 
+                className='shadow-md p-3 outline-none' 
+                value={modalData.valor.toString()}
+                onChange={(e) => setModalData({valor: e.target.value, processo: modalData.processo, id: modalData.id})}
+              />
+            </div>
             {modalErrorMessage && (
               <ErrorMessage error={modalErrorMessage} />
             )}
             <div className=' flex flex-1 justify-between'>
               <div className='w-[200px]'>
-                <Button text='Editar' loading={modalLoaders.edit} onClick={handleEdit(onEditProcesso)} /></div>
+                <Button text='Editar' loading={modalLoaders.edit} onClick={onEditProcesso} /></div>
               <div className='w-[200px]'>
                 <Button text='Excluir' loading={modalLoaders.exclude} exclude={true} onClick={onExcludeProcess} /></div>
             </div>
@@ -249,9 +258,11 @@ export default function Procedimento() {
       <div 
         className='absolute top-0 bottom-0 left-0 right-0 bg-black/50 z-20'
         style={{display: modal ? "block" : "none"}}
-        onClick={() => setModal(false)}
+        onClick={() => {
+          setModalErrorMessage("")
+          setModal(false)
+        }}
       ></div>
-      {modalData.processo}
     </div>
   )
 }

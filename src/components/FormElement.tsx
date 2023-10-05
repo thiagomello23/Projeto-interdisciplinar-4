@@ -10,12 +10,12 @@ export default function FormElement(
       <label htmlFor={label} className='text-xl text-primary-color mb-3 font-bold'>{label}</label>
       <input 
         type={type ? type : "text"}
-        key={defaultValue}
+        // key={defaultValue}
         placeholder={placeholder} 
         id={label} 
+        value={defaultValue}
         className='shadow-md p-3 outline-none' 
         {...register(metadata)}
-        defaultValue={defaultValue}
       />
     </div>
   )
