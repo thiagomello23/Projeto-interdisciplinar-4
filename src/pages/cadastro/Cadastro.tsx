@@ -4,8 +4,12 @@ import Button from '../../components/Button'
 import Select from '../../components/Select'
 import { useForm } from "react-hook-form"
 import dayjs from "dayjs"
-import { api } from '../../lib/axios'
+import fetcher, { api } from '../../lib/axios'
 import { localStorageKey } from '../../globals'
+import useSWR from 'swr'
+import { useNavigate } from 'react-router-dom'
+import { toast, ToastContainer } from 'react-toastify'
+import InputMask from 'react-input-mask';
 
 /* 
   Problemas:
@@ -13,11 +17,30 @@ import { localStorageKey } from '../../globals'
     -- Validar os procedimentos (data.procedimento !== "0"  ||)
 */
 export default function Cadastro() {
-  const { register, handleSubmit } = useForm<CadastroForm>()
+
+  const navigate = useNavigate()
+
+  const { register, handleSubmit, reset, control } = useForm<CadastroForm>()
 
   const [error, setError] = useState<string>("")
+  const [loader, setLoader] = useState<boolean>(false)
+
+  // INITIAL DATA (procedimentos)
+  const { data, error: procErr } = useSWR<ProcedimentoData[]>("/procedimento", fetcher)
+
+  if(procErr) {
+    navigate("/login")
+  }
+
+  if(!data) {
+    return null
+  }
+  // INITIAL DATA (procedimentos)
 
   const onSubmit = async (data: CadastroForm) => {
+    setLoader(true)
+    setError("")
+
     console.log(data)
 
     // Validação minima de dados
@@ -29,32 +52,44 @@ export default function Cadastro() {
       !data.sobrenome || 
       !data.telefone
     ) {
-      //
       setError("Por favor preencha todos os campos!")
+      setLoader(false)
       return;
     }
 
     // Tratamento de Data
-    const horarioFormatado = dayjs(data.data).toISOString()
+    const newDate = data.data.split("/") // Pega em sequencia, Dia, Mes e Ano
+    const engFormat = `${newDate[1]}-${newDate[0]}-${newDate[2]}`;
+    const dataFormatada = dayjs(engFormat).toISOString()
 
     // Envio para a API
-    const { status } = await api.post('', {...data, horario: horarioFormatado}, {
-      headers: {
-        Authorization: localStorage.getItem(localStorageKey)
+    const { status } = await api.post('/paciente', 
+      {
+        ...data, 
+        horario: +data.horario, 
+        idade: +data.idade,
+        data: dataFormatada
+      }, {
+        headers: {
+          Authorization: localStorage.getItem(localStorageKey)
+        }
       }
-    })
+    )
 
     // Resposta
     if(status >= 400) {
-      //
       setError("Campos invalidos!")
     } else {
-      //
+      toast.success("Usuário cadastrado com sucesso!")
+      reset()
     }
+
+    setLoader(false)
   }
 
   return (
     <div className='w-[85%] m-auto'>
+      <ToastContainer />
       <h1 className='text-3xl uppercase mt-6 font-bold'>
         Cadastrar Novo Paciente
       </h1>
@@ -76,34 +111,45 @@ export default function Cadastro() {
           placeholder='Digite o telefone do paciente' 
           metadata='telefone'
           register={register}
+          control={control}
+          mask='(99) 99999-9999'
         />
         <FormElement 
           label='Idade' 
           placeholder='Digite a idade do paciente' 
           metadata='idade'
+          mask='999'
           register={register}
+          control={control}
+          type='text'
         />
         <div className='flex items-center justify-between text-white'>
           <div className='w-[350px]'>
             <Select 
               label='Procedimento' 
-              options={[]}
+              options={data.map(item => {
+                return item.nome
+              })}
               {...register("procedimento")}
             />
           </div>
           <div className='shadow-md p-3 cursor-pointer'>
-            <input 
+            <InputMask 
               type="text"
               className='outline-none p-1 text-black' 
               placeholder='21/10/1974'
+              maskChar={null}
+              mask={"99/99/9999"}
               {...register("data")}
             />
           </div>
           <div>
-            <input 
+            <InputMask 
               type="text" 
               placeholder='ex:21:00' 
               className='outline-none shadow-lg p-3 text-black'
+              mask={"99"}
+              maskChar={null}
               {...register("horario")}
             />
           </div>
@@ -112,7 +158,7 @@ export default function Cadastro() {
           <p className='text-sm text-red-500 text-center font-bold'>{error}</p>
         )}
         <div className='w-[35%] m-auto'>
-          <Button text='Cadastrar' />
+          <Button text='Cadastrar' loading={loader} />
         </div>
       </form>
     </div>

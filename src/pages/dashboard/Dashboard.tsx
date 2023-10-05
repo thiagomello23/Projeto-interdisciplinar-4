@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import {  useState } from 'react'
 import { pacienteTableHeads } from '../../globals'
-import Select from '../../components/Select'
+// import Select from '../../components/Select'
 import Search from '../../components/Search'
 import { BiEdit } from "react-icons/bi"
 import { IconContext } from 'react-icons/'
@@ -10,13 +10,13 @@ import fetcher from '../../lib/axios'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import TableRender from '../../components/TableRender'
+import InputMask from 'react-input-mask';
 
 /* 
   Problemas: 
-    -- Mostrar o valor de cada consulta
-    -- Tamanho da tela não esta suportando 1024px sem quebrar
+    -- Tamanho da tela não esta suportando 1024px sem quebrar (responsividade ainda quebrada)
     -- Colocar uma mascara no input de data
-    -- Filtro e ordenação não funcionam
+    -- Filtro e ordenação não funcionam (Removidos por enquanto)
     -- Puxar por data especifica não funciona
 */
 export default function Dashboard() {
@@ -30,26 +30,27 @@ export default function Dashboard() {
   // FORMS
   const { register, getValues, watch, handleSubmit } = useForm()
 
-  useEffect(() => {
-    // Toda vez que o filtro ou a ordenação mudar
-    console.log(getValues())
-  }, [watch(['filtro', 'ordenacao']), getValues])
+  // Seleção de filtor e ASC|DESC
+  // useEffect(() => {
+  //   // Toda vez que o filtro ou a ordenação mudar
+  //   console.log(getValues())
+  // }, [watch(['filtro', 'ordenacao']), getValues])
 
   // INITIAL FETCHER
-  const { data: tableData, error: tableError } = useSWR('/paciente', fetcher)
+  const { data: tableData, error: tableError, isLoading } = useSWR('/paciente', fetcher)
 
   if(tableError) {
     navigate('/login')
-  }
-
-  if(!tableData) {
-    return null
   }
   // INITIAL FETCHER
 
   // HANDLERS
   const onDataSubmit = (data: any) => {
-    console.log(data)
+    const date = data.data;
+
+    // Puxa os registros com base na data atual
+
+    // Verifica a resposta da requisição
   }
 
   const onSearchSubmit = (data: any) => {
@@ -63,7 +64,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className='w-[90%] m-auto'>
+    <div className='lg:w-full xl:w-[90%] xl:m-auto'>
       <div>
         <h1 className=' text-3xl font-bold mt-8'>
           53 PACIENTES CADASTRADOS PARA HOJE!
@@ -75,10 +76,12 @@ export default function Dashboard() {
           <div
             className='text-lg flex items-center pl-2 shadow-md text-black'
           >
-            <input 
+            <InputMask 
               type="text" 
               className='outline-none'
               placeholder={dayjs().format("D/M/YYYY")}
+              mask={"99/99/9999"}
+              maskChar={null}
               {...register("data")}
             />
             <div className='p-3 ml-2 bg-secondary-color text-white cursor-pointer'>
@@ -101,7 +104,7 @@ export default function Dashboard() {
               </button>
             </form>
           </div>
-          <div className='w-[300px]'>
+          {/* <div className='w-[300px]'>
             <Select 
               label='Selecione um filtro' 
               options={pacienteTableHeads}
@@ -114,7 +117,7 @@ export default function Dashboard() {
               options={['ASC', 'DESC']}
               {...register("ordenacao")}
             />
-          </div>
+          </div> */}
         </div>
         {/* Table */}
         <table className='w-full shadow-lg'>
@@ -129,11 +132,17 @@ export default function Dashboard() {
             {/* Table Render */}
             {searchData ? (
               <TableRender renderItem={searchData} />
-            ) : (
+            ) : tableData ? (
               <TableRender renderItem={tableData} />
-            )}
+            ) : null}
           </tbody>
         </table>
+        {/* Mensagem quando nenhum registro é identificado */}
+        {(tableData?.length === 0 && !isLoading) && (
+            <div className='text-center mt-8'>
+              <h1 className='text-2xl font-bold'>Nenhum cadastro encontrado</h1>
+            </div>
+        )}
       </div>
     </div>
   )

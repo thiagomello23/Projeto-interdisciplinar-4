@@ -37,7 +37,6 @@ export default function Procedimento() {
   const navigate = useNavigate()
  
   const { register, handleSubmit } = useForm<ProcedimentoSubmit>()
-  // const { register: registerEdit, handleSubmit: handleEdit } = useForm<ProcedimentoEdit>() // Bug de estado
   const { register: registerSearch, handleSubmit: handleSearch } = useForm()
 
   // INITIAL DATA
@@ -65,7 +64,10 @@ export default function Procedimento() {
       return;
     }
 
-    if(!(+d.valor > 0)) {
+    // Tratamento de valor
+    const valorFormatado = d.valor.toString().replace(",", ".")
+
+    if(!(+valorFormatado > 0)) {
       setErrorMessage("O campo valor não pode ser negativo!")
       setLoader(false)
       return;
@@ -74,7 +76,7 @@ export default function Procedimento() {
     // Enviar os dados para API
     const { status } = await api.post('/procedimento', {
       nome: d.nomeProcesso,
-      valor: d.valor
+      valor: valorFormatado
     }, {
       headers: {
         Authorization: localStorage.getItem(localStorageKey)
@@ -84,7 +86,7 @@ export default function Procedimento() {
     // Validar o envio
     if(status >= 400) {
       // error handler de procedimento já cadastrado
-      setErrorMessage("Procedimento já cadastrado!")
+      setErrorMessage("Falha ao cadastrar o procedimento!")
     } else {
       // Toasty dizendo que cadastrou com sucesso
       toast.success('Procedimento cadastrado com sucesso!')
