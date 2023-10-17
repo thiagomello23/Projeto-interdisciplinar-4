@@ -11,10 +11,15 @@ export default function RootElement() {
   const navigate = useNavigate()
 
   // Valida se o usuário esta logado ou não
-  const { error } = useSWR(`/auth/${localStorage.getItem(localStorageKey)}`, fetcher)
+  const {  data, isLoading } = useSWR(`/auth/${localStorage.getItem(localStorageKey)}`, fetcher)
 
-  if(error) {
-    navigate("/login")
+  if(!isLoading) {
+    if(data) {
+      if(data.cargo === 'ADMINISTRADOR')
+        navigate('/admin')
+    } else {
+      navigate('/login')
+    }
   }
 
   return (

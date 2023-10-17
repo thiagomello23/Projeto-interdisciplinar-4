@@ -8,6 +8,21 @@ type CadastroForm = {
   horario: string;
 }
 
+type RelatorioForm = {
+  dataInicial: string;
+  dataFinal: string
+  horario: string;
+  procedimento: string;
+  filtro: 'Ascendente'|'Descendente';
+  nome: boolean;
+  sobrenome: boolean;
+  idade: boolean;
+  procedimento: boolean;
+  horario: boolean;
+  valor: boolean;
+  telefone: boolean;
+}
+
 type DashboardData = {
   id: string;
   nome: string;

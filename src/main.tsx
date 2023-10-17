@@ -8,15 +8,3 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Router />
   </React.StrictMode>,
 )
-// Mudar o nome do pacientesTableHeads
-// Criar componente para titulo
-// Fazer a tipagem de dados das telas, Colocar loaders nos botoes, 
-// fazer error handlers, adicionar toasts, adicionar skeleton loaders
-// Colocar tipagem dinamica nos inputs
-// Bug no procedimento, botao com cor diferente e problema no submit
-
-// Fazer a tipagem de maneira correta
-// Achar uma maneira melhor de fazer busca usando JS
-// Adicionar mascara nos inputs
-// Aumentar tempo de vida do token
-// corrigir problema no update dos processos

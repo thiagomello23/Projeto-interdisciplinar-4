@@ -1,13 +1,26 @@
 import {} from 'react'
 import { NavLink } from 'react-router-dom'
+import useSWR from "swr"
+import fetcher from '../lib/axios'
+import { localStorageKey } from '../globals'
+import { useNavigate } from 'react-router-dom'
 
 export default function Navbar() {
+
+  const navigate = useNavigate()
+  const { data, isLoading } = useSWR(`/auth/${localStorage.getItem(localStorageKey)}`, fetcher)
+
+  const logout = () => {
+    localStorage.clear()
+    navigate('/login')
+  }
+
   return (
     <nav className='text-white min-h-screen w-[300px] bg-primary-color relative'>
       <h1 className='bg-secondary-color text-2xl mb-28 p-4 text-center'>
         Bem vindo
         <br />
-        "Nome"
+        {isLoading ? "Usuario" : `"${data.nome}"`}
       </h1>
       <ul className='text-center flex flex-col'>
         <NavLink 
@@ -51,7 +64,7 @@ export default function Navbar() {
           </li>
         </NavLink>
       </ul>
-      <button className='absolute bottom-0 w-full text-center p-3 bg-secondary-color hover:bg-opacity-70 text-lg transition-all duration-200'>
+      <button className='absolute bottom-0 w-full text-center p-3 bg-secondary-color hover:bg-opacity-70 text-lg transition-all duration-200' onClick={logout}>
         Logout
       </button>
     </nav>

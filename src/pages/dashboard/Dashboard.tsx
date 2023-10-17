@@ -16,9 +16,7 @@ import ErrorMessage from '../../components/ErrorMessage'
 /* 
   Problemas: 
     -- Tamanho da tela não esta suportando 1024px sem quebrar (responsividade ainda quebrada)
-    -- Colocar uma mascara no input de data
     -- Filtro e ordenação não funcionam (Removidos por enquanto)
-    -- Puxar por data especifica não funciona
 */
 export default function Dashboard() {
 
@@ -38,6 +36,10 @@ export default function Dashboard() {
 
   if(tableError) {
     navigate('/login')
+  }
+
+  if(!tableData) {
+    return null
   }
   // INITIAL FETCHER
 
@@ -97,7 +99,7 @@ export default function Dashboard() {
     <div className='lg:w-full xl:w-[90%] xl:m-auto'>
       <div>
         <h1 className=' text-3xl font-bold mt-8'>
-          53 PACIENTES CADASTRADOS PARA HOJE!
+          {tableData.length} PACIENTE(S) CADASTRADOS PARA HOJE!
         </h1>
         <div className='w-full flex justify-between items-center mt-16 mb-5'>
 
@@ -167,23 +169,3 @@ export default function Dashboard() {
     </div>
   )
 }
-// Seleção de filtor e ASC|DESC
-// useEffect(() => {
-//   // Toda vez que o filtro ou a ordenação mudar
-//   console.log(getValues())
-// }, [watch(['filtro', 'ordenacao']), getValues])
-
-{/* <div className='w-[300px]'>
-  <Select 
-    label='Selecione um filtro' 
-    options={pacienteTableHeads}
-    {...register("filtro")}
-  />
-</div>
-<div className='w-[100px]'>
-  <Select 
-    label='ASC' 
-    options={['ASC', 'DESC']}
-    {...register("ordenacao")}
-  />
-</div> */}
