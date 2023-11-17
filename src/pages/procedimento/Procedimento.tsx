@@ -178,6 +178,7 @@ export default function Procedimento() {
     } else {
       mutate()
       setModalErrorMessage("")
+      setModal(false)
       toast.success("Procedimento deletado com sucesso!")
     }
   }

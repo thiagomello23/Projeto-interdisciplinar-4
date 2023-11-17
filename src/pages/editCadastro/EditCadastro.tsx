@@ -3,7 +3,7 @@ import dayjs from "dayjs"
 import fetcher, { api } from '../../lib/axios'
 import { localStorageKey } from '../../globals'
 import useSWR from 'swr'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
 import InputMask from 'react-input-mask';
 import { FormEvent, useEffect, useState } from "react"
@@ -11,6 +11,7 @@ import { FormEvent, useEffect, useState } from "react"
 export default function Cadastro() {
 
   const navigate = useNavigate()
+  const { id } = useParams()
 
   const [error, setError] = useState<string>("")
   const [loader, setLoader] = useState<boolean>(false)
@@ -26,7 +27,7 @@ export default function Cadastro() {
 
   // INITIAL DATA (procedimentos e paciente)
   const { data, error: procErr } = useSWR<ProcedimentoData[]>("/procedimento", fetcher)
-  const { data: editData } = useSWR<DashboardData>(`/paciente/single/${18}`, fetcher)
+  const { data: editData } = useSWR<DashboardData>(`/paciente/single/${id}`, fetcher)
 
   useEffect(() => {
     if(editData) {
