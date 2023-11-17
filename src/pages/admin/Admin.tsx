@@ -41,12 +41,15 @@ export default function Admin() {
       return;
     }
 
+    console.log(d)
+
     // Envio para a API
-    const { status } = await api.post('/usuario/createUser', {
+    const { status } = await api.post('/usuario', {
       nome: d.nome,
       email: d.email,
       telefone: d.telefone,
-      senha: d.senha
+      senha: d.senha,
+      cargo: "USUARIO"
     })
 
     // Error handlers e loaders
@@ -124,9 +127,9 @@ export default function Admin() {
           </thead>
           <tbody>
             {searchData.length !== 0 ? searchData.map((el: any) => (
-              <TableElement data={[el.nome, el.email, el.telefone]} />
+              <TableElement id='#' data={[el.nome, el.email, el.telefone]} />
             )) : data.map((el: any) => (
-              <TableElement data={[el.nome, el.email, el.telefone]} />
+              <TableElement id='#' data={[el.nome, el.email, el.telefone]} />
             ))}
           </tbody>
         </table>
