@@ -34,7 +34,7 @@ type DashboardData = {
   telefone: string;
   usuarioId: string;
   // Não existe "valor" em paciente
-  valor: string;
+  // valor: string;
 }
 
 type ProcedimentoData = {

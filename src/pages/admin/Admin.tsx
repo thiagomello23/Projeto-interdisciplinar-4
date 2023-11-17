@@ -26,7 +26,7 @@ export default function Admin() {
     navigate('/login')
   }
 
-  if(isLoading) {
+  if(isLoading || !data) {
     return null;
   }
 

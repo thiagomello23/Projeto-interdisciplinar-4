@@ -6,7 +6,7 @@ export default function TableRender({renderItem}: {renderItem: DashboardData[]})
     <>
       {renderItem.map((item: DashboardData) => (
         <Fragment key={item.id}>
-          <TableElement data={
+          <TableElement id={item.id} data={
             [
               item.nome,
               item.sobrenome,

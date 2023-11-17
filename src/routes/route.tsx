@@ -8,6 +8,7 @@ import Cadastro from "../pages/cadastro/Cadastro"
 import Procedimento from "../pages/procedimento/Procedimento"
 import Relatorio from "../pages/relatorio/Relatorio"
 import Admin from "../pages/admin/Admin"
+import EditCadastro from "../pages/editCadastro/EditCadastro"
 
 export const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
       {
         path: '/relatorios',
         element: <Relatorio />
+      },
+      {
+        path: '/cadastro/:id',
+        element: <EditCadastro />
       }
     ]
   },

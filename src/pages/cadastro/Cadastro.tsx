@@ -144,7 +144,7 @@ export default function Cadastro() {
           <div>
             <InputMask 
               type="text" 
-              placeholder='ex:21:00' 
+              placeholder='Digite a hora que ocorrera' 
               className='outline-none shadow-lg p-3 text-black'
               mask={"99"}
               maskChar={null}

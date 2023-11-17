@@ -13,11 +13,6 @@ import TableRender from '../../components/TableRender'
 import InputMask from 'react-input-mask';
 import ErrorMessage from '../../components/ErrorMessage'
 
-/* 
-  Problemas: 
-    -- Tamanho da tela não esta suportando 1024px sem quebrar (responsividade ainda quebrada)
-    -- Filtro e ordenação não funcionam (Removidos por enquanto)
-*/
 export default function Dashboard() {
 
   // STATES
